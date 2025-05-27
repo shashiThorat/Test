@@ -1,0 +1,228 @@
+definitions:
+  models.CloneRequest:
+    properties:
+      branch:
+        example: main
+        type: string
+      destination:
+        example: ./repo
+        type: string
+      password:
+        example: password
+        type: string
+      provider:
+        enum:
+        - github
+        - gitlab
+        - bitbucket
+        example: github
+        type: string
+      ssh_key_path:
+        example: ~/.ssh/id_rsa
+        type: string
+      token:
+        example: ghp_xxxxxxxxxxxx
+        type: string
+      url:
+        example: https://github.com/user/repo.git
+        type: string
+      username:
+        example: username
+        type: string
+    required:
+    - destination
+    - provider
+    - url
+    type: object
+  models.ErrorResponse:
+    properties:
+      error:
+        example: Invalid request parameters
+        type: string
+    type: object
+  models.HealthResponse:
+    properties:
+      status:
+        example: ok
+        type: string
+      version:
+        example: 1.0.0
+        type: string
+    type: object
+  models.PRCommentRequest:
+    properties:
+      comment:
+        example: This looks good!
+        type: string
+      file_path:
+        example: src/main.go
+        type: string
+      line_number:
+        example: 42
+        minimum: 1
+        type: integer
+      password:
+        example: password
+        type: string
+      pr_url:
+        example: https://github.com/user/repo/pull/123
+        type: string
+      provider:
+        enum:
+        - github
+        - gitlab
+        - bitbucket
+        example: github
+        type: string
+      token:
+        example: ghp_xxxxxxxxxxxx
+        type: string
+      username:
+        example: username
+        type: string
+    required:
+    - comment
+    - file_path
+    - line_number
+    - pr_url
+    - provider
+    type: object
+  models.Response:
+    properties:
+      data: {}
+      error:
+        example: An error occurred
+        type: string
+      message:
+        example: Operation completed successfully
+        type: string
+      success:
+        example: true
+        type: boolean
+    type: object
+info:
+  contact: {}
+paths:
+  /clone:
+    post:
+      consumes:
+      - application/json
+      description: Clone a Git repository from GitHub, GitLab, or Bitbucket
+      parameters:
+      - description: Clone Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.CloneRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Clone a repository
+      tags:
+      - git
+  /health:
+    get:
+      consumes:
+      - application/json
+      description: Get the health status of the API
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.HealthResponse'
+      summary: Check API health
+      tags:
+      - health
+  /prcomment:
+    post:
+      consumes:
+      - application/json
+      description: Add a comment to a specific line in a pull/merge request from GitHub,
+        GitLab, or Bitbucket
+      parameters:
+      - description: PR Comment Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.PRCommentRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Add a comment to a pull/merge request
+      tags:
+      - git
+  /prdiff:
+    get:
+      consumes:
+      - application/json
+      description: Get the diff for a pull/merge request from GitHub, GitLab, or Bitbucket
+      parameters:
+      - description: Provider (github, gitlab, bitbucket)
+        in: query
+        name: provider
+        required: true
+        type: string
+      - description: Pull/Merge Request URL
+        in: query
+        name: pr_url
+        required: true
+        type: string
+      - description: Authentication token
+        in: query
+        name: token
+        type: string
+      - description: Username for authentication
+        in: query
+        name: username
+        type: string
+      - description: Password for authentication
+        in: query
+        name: password
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get pull/merge request diff
+      tags:
+      - git
+swagger: "2.0"
