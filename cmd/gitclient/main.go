@@ -23,8 +23,6 @@ var (
 
 // Command line flags
 var (
-	providerType = flag.String("provider", "github", "Git provider (github, gitlab, bitbucket)")
-	repoURL      = flag.String("url", "", "Repository URL")
 	destination  = flag.String("dest", ".", "Destination directory")
 	branch       = flag.String("branch", "", "Branch to clone")
 	username     = flag.String("username", "", "Username for authentication")
